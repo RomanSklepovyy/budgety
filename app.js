@@ -7,6 +7,26 @@ var budgetController = (function () {
 
 var UIController = (function () {
 
+    var DOMstrings = {
+        inputType: '.add__type',
+        inputDescription: '.add__description',
+        inputValue: '.add__value',
+        inputBtn: '.add__btn'
+    };
+
+    return {
+        getInput: function () {
+            return {
+                type: document.querySelector(DOMstrings.inputType).value, // will be inc or exp
+                description: document.querySelectorAll(DOMstrings.inputDescription).value,
+                inputValue: document.querySelector(DOMstrings.inputValue).value
+            }
+        },
+
+        getDOMstrings : function () {
+            return DOMstrings;
+        }
+    };
 
 })();
 
@@ -14,25 +34,44 @@ var UIController = (function () {
 
 var controller = (function (budgetCtrl, UICtrl) {
 
-var addItem = function () {
+    var setupEventListners = function () {
 
-    // Get input data
+        var DOM = UICtrl.getDOMstrings();
+        
+        document.querySelector(DOM.inputBtn).addEventListener('click', ctrlAddItem);
+        
+        document.addEventListener('keypress', function (event) {
+            if(event.keyCode === 13 || event.which === 12) {
+                ctrlAddItem();
+            }
+        });
+    };
 
-    // Add item to the budget controller
+    var ctrlAddItem = function () {
+        
+        // Get input data
+        var input = UICtrl.getInput();
+        console.log(input);
 
-    // Add item to the UI
+        // Add item to the budget controller
 
-    // Calculate budget
 
-    // Display the buget on the UI
-};
+        // Add item to the UI
 
-document.querySelector('.add__btn').addEventListener('click', addItem);
 
-document.addEventListener('keypress', function (event) {
-   if(event.keyCode === 13 || event.which === 12) {
-       addItem();
-   }
-});
+        // Calculate budget
 
+
+        // Display the buget on the UI
+
+    };
+    
+    return {
+        init: function () {
+            setupEventListners();
+        }
+    }
+    
 })(budgetController, UIController);
+
+controller.init();

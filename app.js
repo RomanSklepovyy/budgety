@@ -6,6 +6,18 @@ var budgetController = (function () {
         this.id = id;
         this.description = description;
         this.value = value;
+        this.percentage = -1;
+    };
+
+    Expense.prototype.calcPercentage = function (totalIncome) {
+
+       if (totalIncome > 0) {
+           this.percentage = Math.round((this.value / totalIncome) * 100);
+       }
+    };
+
+    Expense.prototype.getPercentage = function () {
+        return this.percentage;
     };
 
     var Income = function (id, description, value) {
@@ -95,6 +107,22 @@ var budgetController = (function () {
             } else {
                 data.percentage = -1;
             }
+        },
+
+        calculatePercentages: function() {
+
+            data.allItems.exp.forEach(function (current) {
+               current.calcPercentage(data.totals.inc);
+            });
+        },
+
+        getPercentages: function() {
+
+            var allPerc = data.allItems.exp.map(function (current) {
+                return current.getPercentage();
+            });
+
+            return allPerc;
         },
 
         getBudget: function() {
@@ -251,6 +279,19 @@ var controller = (function (budgetCtrl, UICtrl) {
         UICtrl.displayBudget(budget);
     };
 
+    var updatePercentages = function () {
+
+        // Calculate percentages
+        budgetCtrl.calculatePercentages();
+
+        // Read percentages from budget controller
+        var percentages = budgetCtrl.getPercentages();
+
+        // Update the UI
+
+
+    };
+
     var ctrlAddItem = function () {
 
         var input, newItem;
@@ -271,8 +312,10 @@ var controller = (function (budgetCtrl, UICtrl) {
 
             // Calculate and update budget
             updateBudget();
-        }
 
+            // Calculate and update percentages
+            updatePercentages();
+        }
     };
 
     var ctrlDeleteItem = function (event) {
@@ -281,6 +324,7 @@ var controller = (function (budgetCtrl, UICtrl) {
         itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
 
         if (itemID) {
+
             splitID = itemID.split('-');
             type = splitID[0];
             id = parseInt(splitID[1]);
@@ -295,6 +339,8 @@ var controller = (function (budgetCtrl, UICtrl) {
             updateBudget();
         }
 
+        // Calculate and update percentages
+        updatePercentages();
     };
     
     return {

@@ -160,6 +160,25 @@ var UIController = (function () {
         expPercentageLabel: '.item__percentage'
     };
 
+    var formatType = function (number, type) {
+
+        var numSplit, int, dec;
+
+        number = Math.abs(number);
+        number = number.toFixed(2);
+
+        numSplit = number.split('.');
+
+        int = numSplit[0];
+        dec = numSplit[1];
+
+        if (int.length > 3) {
+            int = int.substr(0, int.length - 3) + ',' + int.substr(int.length - 3, 3);
+        }
+
+        return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec;
+    };
+
     return {
         getInput: function () {
             return {
@@ -204,7 +223,7 @@ var UIController = (function () {
             // Replace placeholder text
             newHtml = html.replace('%id%', obj.id);
             newHtml = newHtml.replace('%description%', obj.description);
-            newHtml = newHtml.replace('%value%', obj.value);
+            newHtml = newHtml.replace('%value%', formatType(obj.value, type));
 
             // Insert the HTML into the DOM
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
@@ -230,9 +249,12 @@ var UIController = (function () {
         },
 
         displayBudget: function(dataObj) {
-            document.querySelector(DOMstrings.budgetLabel).textContent = dataObj.budget;
-            document.querySelector(DOMstrings.incomeLabel).textContent = dataObj.totalInc;
-            document.querySelector(DOMstrings.expenseLabel).textContent = dataObj.totalExp;
+            var type;
+            dataObj.budget > 0 ? type = 'inc' : type = 'exp';
+
+            document.querySelector(DOMstrings.budgetLabel).textContent = formatType(dataObj.budget, type);
+            document.querySelector(DOMstrings.incomeLabel).textContent = formatType(dataObj.totalInc, 'inc');
+            document.querySelector(DOMstrings.expenseLabel).textContent = formatType(dataObj.totalExp, 'exp');
 
             if (dataObj.percentage > 0) {
                 document.querySelector(DOMstrings.percentageLabel).textContent = dataObj.percentage + '%';
